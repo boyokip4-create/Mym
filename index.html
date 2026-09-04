@@ -81,6 +81,9 @@ input[type=range]{width:100%;accent-color:#FFC400;margin:20px 0;height:8px}
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+/* Ensure the hidden attribute actually hides the overlay (fixes global blur when overlay present) */
+.error-overlay[hidden]{display:none}
+
 .error-overlay__backdrop {
   position: absolute;
   inset: 0;
