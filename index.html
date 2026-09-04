@@ -82,7 +82,15 @@ input[type=range]{width:100%;accent-color:#FFC400;margin:20px 0;height:8px}
 }
 
 /* Ensure the hidden attribute actually hides the overlay (fixes global blur when overlay present) */
-.error-overlay[hidden]{display:none}
+.error-overlay[hidden]{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+.error-overlay[hidden] .error-overlay__backdrop{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
 
 .error-overlay__backdrop {
   position: absolute;
@@ -294,7 +302,7 @@ input[type=range]{width:100%;accent-color:#FFC400;margin:20px 0;height:8px}
 </div>
 
 <!-- Error Overlay (inserted) -->
-<div id="error-overlay" class="error-overlay" role="alertdialog" aria-modal="true" aria-labelledby="error-title" aria-describedby="error-message" hidden>
+<div id="error-overlay" class="error-overlay" role="alertdialog" aria-modal="true" aria-labelledby="error-title" aria-describedby="error-message" hidden style="display:none;visibility:hidden;pointer-events:none;">
   <div class="error-overlay__backdrop" data-close-overlay></div>
   <div class="error-overlay__panel" role="document">
     <button class="error-overlay__close" aria-label="Close" data-close-overlay>
@@ -714,6 +722,10 @@ function trapFocus(container) {
   function hideOverlay() {
     if (!overlay || overlay.hasAttribute('hidden')) return;
     overlay.setAttribute('hidden', '');
+    // ensure inline styles also hide it (browser caching / inline fallback)
+    overlay.style.display = 'none';
+    overlay.style.visibility = 'hidden';
+    overlay.style.pointerEvents = 'none';
     if (removeTrap) { removeTrap(); removeTrap = null; }
     if (autoDismissTimeout) { clearTimeout(autoDismissTimeout); autoDismissTimeout = null; }
     if (lastActive && lastActive.focus) lastActive.focus();
@@ -724,6 +736,11 @@ function trapFocus(container) {
     if (!overlay) return;
     lastActive = document.activeElement;
     overlay.removeAttribute('hidden');
+    // remove inline hide styles so it becomes visible even if set as a fallback
+    overlay.style.display = '';
+    overlay.style.visibility = '';
+    overlay.style.pointerEvents = '';
+
     titleEl.textContent = title;
     messageEl.textContent = message;
     hintEl.textContent = hint || '';
